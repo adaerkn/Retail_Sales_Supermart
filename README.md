@@ -8,7 +8,6 @@ Bu proje, bir süpermarketin perakende satış verilerini analiz etmek için haz
 * **Excel:** Veri setinin ilk keşifsel analizi ve görselleştirme çalışmaları için Excel pivot tabloları ve grafikleri kullanılmıştır.
 * **SQL:** Veri tabanı sorgulamaları ve veri manipülasyonu için SQL kullanılmıştır.
 
-## Proje İçeriği
 
 
 linkedin: https://www.linkedin.com/in/ada-erkan-977957249/

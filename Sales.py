@@ -6,23 +6,13 @@ import seaborn as sns
 
 dataset = pd.read_csv("Supermart Grocery Sales - Retail Analytics Dataset.csv")
 
-#py dosyası olduğu için print yazmam lazım
 
 print(dataset.head(10))
-
-#pivot benzeri analizler groupby yardımıyla
-#matplotlib aylık satış trendi grafiği
 
 
 print(dataset.columns)
 
 #Category Oil&Masala olanların kar oranı görünsün
-
-#profit_category= dataset.groupby(["Category"]=="Oils & Masala")[["Profit"]].sum().sort_values(by="Profit", ascending=False)
-#print(profit_category)
-#bu şekilde çalışmaz
-#Oil masala nın görünmesi için önce sadece onu sınıflandırmalıyım ayrı veri seti olarak
-# ya da sadece .loc[istediğim şey] yaparak da bulabilirim kısaca
 
 #1. yol
 profit_category= dataset.groupby(["Category"])[["Profit"]].sum().sort_values(by="Profit", ascending=False)
@@ -36,8 +26,7 @@ print(oil_category)
 print(profit_category)
 
 print(dataset["Region"])
-# Region= South olanların sales, city, sub category görünsün
-#region_sales=dataset[dataset["Region"]=="South"] sadece böyle olursa south olan gözükür
+
 region_sales=dataset[dataset["Region"]=="South"]
 sales=region_sales.groupby(["Region","City","Sub Category"])[["Sales"]].sum().sort_values(by="Sales", ascending=False)
 print(sales)
@@ -47,11 +36,9 @@ print(sales)
 
 #Sub_category == Rice olsun
 
-#datamı sınıflandırmam lazım!
 rice_sub=dataset[dataset["Sub Category"]=="Rice"]
-# satışları gruplandırman lazım bölgelere göre
 rice_group=rice_sub.groupby(["Region"])["Sales"].sum().reset_index()
-#Sales sütununda sum işlemim uygulanır
+
 plt.figure(figsize = (10,10))
 plt.bar(x= rice_group["Region"], height= rice_group["Sales"], data= rice_group)
 plt.title("Bölgelere Göre Pirinç Satışları")
@@ -59,7 +46,7 @@ plt.xlabel("Bölgeler")
 plt.ylabel("Toplam Satışlar")
 plt.show()
 
-#key error hatası almamak için reset_index kullan
+
 
 #Health drinks kategorime ait yıllık satış verisi olsun
 health_drinks=dataset[dataset["Sub Category"]==("Health Drinks")]
@@ -74,10 +61,46 @@ plt.bar(x=year_sales["Order Date"], height= year_sales["Sales"], data= year_sale
 plt.xticks(year_sales["Order Date"])
 plt.title("Yıllara göre Sağlık içeceklerin satış tutarı")
 plt.show()
-#2018,5 gibi gözükmemesi için plt.xticks kullanarak neye göre düzeltme istersem
+
+
+#Maliyet hesaplama gösteren işlem satış-profit
+dataset["Cost"]= dataset["Sales"]-dataset["Profit"]
+print(dataset[["Cost","Category","Sub Category"]])
+
+
+#maliyetleri toplam kategori bazında gösterin
+category_cost= dataset.groupby(["Category"])[["Cost"]].sum().sort_values(by="Cost", ascending=False)
+print(category_cost)
 
 
 
-#datetime formatına çevir
-#dt.year komutu liste üzerinde olmaz pandas series üzerinde olur direkt group by
-#yaparken [Order Date] olmuyor
+#Ortalama üstünü gösteren satış
+mean_sales=dataset["Sales"].mean()
+new_retail= dataset[dataset["Sales"]>= mean_sales] 
+print(new_retail[["Sales", "Category","Sub Category"]])
+
+
+
+category_mean= new_retail.groupby(["Category","Sub Category"])[["Sales"]].sum().sort_values(by="Sales", ascending=False).reset_index()
+print(category_mean)
+
+plt.figure(figsize=(10,10))
+sns.barplot(x="Category", y="Sales" ,data=category_mean ) 
+plt.xlabel("Category")
+plt.ylabel("Sales")
+plt.xticks(rotation=90)
+plt.show()
+
+#chocolates kategorisindeki discount ve şehir indirim oranlarını gösteren bir lineplot oluştur
+
+choco_sub= dataset[dataset["Sub Category"]=="Chocolates"]
+choco_discount= choco_sub.groupby(["Region"])[["Discount"]].sum().reset_index()
+print(choco_discount)
+
+plt.figure(figsize=(10,10))
+sns.lineplot(x="Region", y="Discount", data=choco_discount)
+plt.xlabel("Region")
+plt.ylabel("Discount")
+plt.xticks(rotation=90)
+plt.show()
+
